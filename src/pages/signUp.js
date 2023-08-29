@@ -1,13 +1,67 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styles from '@/styles/Login.module.css'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+
+import { v4 as uuidv4 } from 'uuid'
+import { account } from '@/appwrite/appwriteConfig'
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { FcGoogle } from 'react-icons/fc'
 import { AiFillGithub } from "react-icons/ai";
 import { FaTwitter, FaFacebookSquare } from "react-icons/fa"
+import { useRouter } from 'next/router'
 
 export default function signUp() {
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    function handleInputChange(event) {
+        const eventFrom = event.target.id
+
+        if (eventFrom === "name") {
+            setName(event.target.value)
+        } else if (eventFrom === "email") {
+            setEmail(event.target.value)
+        } else if (eventFrom === "password") {
+            setPassword(event.target.value)
+        }
+    }
+
+    async function submitForm(e) {
+        e.preventDefault();
+        try {
+            await toast.promise(
+                () => registerUser(),
+                {
+                    pending: 'Registering User',
+                    success: 'Registed User Sucessfully 👌',
+                    error: 'Operation Failed 🤯',
+                }
+            );
+        } catch (error) {
+            console.error("An error occurred:", error);
+            toast.error(String(error));
+        }
+    }
+
+    async function registerUser() {
+        try {
+            const response = await account.create(uuidv4(), email, password, name);
+            console.log(response);
+            router.push("/")
+            if (response.err) {
+                throw new Error(response.err);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
     return (
         <>
             <Head>
@@ -22,31 +76,58 @@ export default function signUp() {
                         <Image src={"/logo.png"} alt={"logo"} width={80} height={80} />
                         <h1>Welcome To Sensory-Cademy</h1>
                         <p>Login Via Email Or Social Handles</p>
-                        <form className={styles.formInput}>
+                        <form onSubmit={submitForm} className={styles.formInput}>
                             <div className={styles.socialHandles}>
                                 <button><FcGoogle /></button>
                                 <button><Image src={"/linkedin.svg"} className={styles.linkedin} width={22} height={22} /></button>
                                 <button><AiFillGithub /></button>
-                                <button><FaTwitter className={styles.twitter}/></button>
-                                <button><FaFacebookSquare className={styles.facebook}/></button>
+                                <button><FaTwitter className={styles.twitter} /></button>
+                                <button><FaFacebookSquare className={styles.facebook} /></button>
                             </div>
                             <div className={styles.divider}>OR</div> {/* Divider with text */}
                             <input
-                                type="name"
+                                type="text"
                                 placeholder="Enter Your Name"
+                                value={name}
+                                id='name'
+                                required
+                                autocomplete="off"
+                                onChange={handleInputChange}
                             />
                             <input
                                 type="email"
                                 placeholder="Enter Your Email"
+                                value={email}
+                                autocomplete="off"
+                                required
+                                id='email'
+                                onChange={handleInputChange}
                             />
                             <input
                                 type="password"
+                                autocomplete="off"
+                                required
+                                id='password'
                                 placeholder="Enter Your Password"
+                                value={password}
+                                onChange={handleInputChange}
                             />
                             <button className={styles.submit} type="submit">Sign Up</button>
                             <p>Already have an account ?? <Link href='/'>Log In</Link></p>
                         </form>
                     </div>
+                    <ToastContainer
+                        position="bottom-center"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="dark"
+                    />
                 </main>
             </main>
         </>
