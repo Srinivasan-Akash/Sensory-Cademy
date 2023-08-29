@@ -1,7 +1,7 @@
 .loginContainer {
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(0deg, #10141F 0%, #10141F 100%), linear-gradient(0deg, #10141F 0%, #10141F 100%), linear-gradient(0deg, #10141F 0%, #10141F 100%), #10141F;
+    background: var(--bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,13 +12,13 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-family: var(--primary-font-family);
 }
 
 .loginForm h1,
 .loginForm p {
     line-height: 1;
-    color: #8DA0AE;
+    color: var(--white);
 }
 
 .loginContainer h1 {
@@ -80,7 +80,7 @@
     width: 100%;
     align-items: center;
     text-align: center;
-    color: #8DA0AE;
+    color: var(--white);
 
     margin: 10px 0 2px 0;
 }
@@ -89,7 +89,7 @@
 .divider::after {
     content: "";
     flex: 1;
-    border-top: 2px solid #928d8d2c;
+    border-top: 2px solid var(--secondary-color);
 }
 
 .divider::before {
@@ -101,22 +101,22 @@
 }
 
 .submit {
-    background: #20344D !important;
+    background: var(--button-color) !important;
     margin-bottom: .5em;
 }
 
 .formInput p {
-    color: #8DA0AE;
+    color: var(--white);
 }
 
 .linkedin {
-    filter: brightness(0) saturate(100%) invert(24%) sepia(80%) saturate(3020%) hue-rotate(193deg) brightness(85%) contrast(83%);
+    filter: var(--linkedin-filter);
 }
 
 .twitter {
-    fill: #1da1f2;
+    fill: var(--twitter-color);
 }
 
 .facebook {
-    fill: #1877f2;
+    fill: var(--facebook-color);
 }

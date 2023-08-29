@@ -1,5 +1,12 @@
 :root {
-  
+  --bg: linear-gradient(0deg, #10141F 0%, #10141F 100%), linear-gradient(0deg, #10141F 0%, #10141F 100%), linear-gradient(0deg, #10141F 0%, #10141F 100%), #10141F;
+  --primary-font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  --white: #8DA0AE;
+  --button-color: #20344D;
+  --linkedin-filter: brightness(0) saturate(100%) invert(24%) sepia(80%) saturate(3020%) hue-rotate(193deg) brightness(85%) contrast(83%);
+  --twitter-color: #1da1f2;
+  --facebook-color: #1877f2;
+  --secondary-color: #928d8d2c
 }
 
 * {

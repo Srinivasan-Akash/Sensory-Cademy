@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { FcGoogle } from 'react-icons/fc'
 import { AiFillGithub } from "react-icons/ai";
 import { FaTwitter, FaFacebookSquare } from "react-icons/fa"
+
 // React Toastify
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
