@@ -2,6 +2,7 @@ import React from 'react';
 import styles from '@/styles/OnBoarding.module.css';
 
 export default function OnBoarding() {
+
   const questions = [
     {
       question: "Who Are You ??",
@@ -20,7 +21,7 @@ export default function OnBoarding() {
   function nextQuestion() {
     const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
     const newScrollPosition = currentScrollPosition + window.innerHeight;
-  
+
     // Scroll to the new position with a smooth animation
     window.scrollTo({
       top: newScrollPosition,
@@ -32,10 +33,10 @@ export default function OnBoarding() {
     // Calculate the new scroll position by subtracting 100vh from the current scroll position
     const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
     const newScrollPosition = currentScrollPosition - window.innerHeight;
-  
+
     // Ensure the new scroll position doesn't go below 0
     const finalScrollPosition = Math.max(0, newScrollPosition);
-  
+
     // Scroll to the new position with a smooth animation
     window.scrollTo({
       top: finalScrollPosition,
@@ -45,6 +46,7 @@ export default function OnBoarding() {
 
   return (
     <main className={styles.container}>
+      
       {questions.map((element, index) => (
         <div className={styles.question} key={index}>
           <h1>{element.question}</h1>

@@ -1,14 +1,11 @@
 .container {
     background: var(--bg);
-    height: 100vh;
-    width: 100vw;
-    display: grid;
     text-align: center;
     color: var(--white);
     font-family: var(--primary-font-family);
-    gap: 1em;
-    height: fit-content;
-    overflow: hidden;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100vh;
 }
 
 .question {
@@ -17,6 +14,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    scroll-snap-align: start;
 }
 
 .options {
@@ -31,7 +29,7 @@
     padding: 1em;
     border-radius: 15px;
     width: 20vw;
-    cursor: pointer; 
+    cursor: pointer;
 }
 
 .option:not(:hover) {
