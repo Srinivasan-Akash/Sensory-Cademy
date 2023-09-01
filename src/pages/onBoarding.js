@@ -1,8 +1,8 @@
 import React from 'react';
 import styles from '@/styles/OnBoarding.module.css';
+import Image from 'next/image';
 
 export default function OnBoarding() {
-
   const questions = [
     {
       question: "Who Are You ??",
@@ -18,37 +18,10 @@ export default function OnBoarding() {
     }
   ];
 
-  function nextQuestion() {
-    const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    const newScrollPosition = currentScrollPosition + window.innerHeight;
-
-    // Scroll to the new position with a smooth animation
-    window.scrollTo({
-      top: newScrollPosition,
-      behavior: "smooth"
-    });
-  }
-
-  function prevQuestion() {
-    // Calculate the new scroll position by subtracting 100vh from the current scroll position
-    const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    const newScrollPosition = currentScrollPosition - window.innerHeight;
-
-    // Ensure the new scroll position doesn't go below 0
-    const finalScrollPosition = Math.max(0, newScrollPosition);
-
-    // Scroll to the new position with a smooth animation
-    window.scrollTo({
-      top: finalScrollPosition,
-      behavior: "smooth"
-    });
-  }
-
   return (
     <main className={styles.container}>
-      
       {questions.map((element, index) => (
-        <div className={styles.question} key={index}>
+        <div className={styles.question} id={`question-${index}`} key={index}>
           <h1>{element.question}</h1>
           <div className={styles.options}>
             {element.options.map((option, optionIndex) => (
@@ -61,8 +34,8 @@ export default function OnBoarding() {
       ))}
 
       <div className={styles.navigationButtons}>
-        <button onClick={prevQuestion}>Prev</button>
-        <button onClick={nextQuestion}>Next</button>
+        <button>Made By Akash With Love 💖</button>
+        <button><Image src={"/codingyogi.png"} width={60} height={30}/></button>
       </div>
     </main>
   );

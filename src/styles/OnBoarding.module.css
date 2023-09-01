@@ -47,7 +47,7 @@
 .navigationButtons {
     position: fixed;
     bottom: 2%;
-    right: 1%;
+    right: 2%;
     display: flex;
     gap: .5em;
 }
@@ -60,6 +60,9 @@
     background: #182a3f;
     color: #8DA0AE;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .navigationButtons button:not(:hover) {
