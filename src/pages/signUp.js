@@ -8,8 +8,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { account, databases } from '@/appwrite/appwriteConfig'
 
 import getConfig from 'next/config';
-const { publicRuntimeConfig } = getConfig();
-
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,6 +22,7 @@ export default function signUp() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const router = useRouter()
+    const { publicRuntimeConfig } = getConfig();
 
     function handleInputChange(event) {
         const eventFrom = event.target.id

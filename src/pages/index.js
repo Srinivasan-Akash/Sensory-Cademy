@@ -3,29 +3,42 @@ import Image from 'next/image'
 import styles from '@/styles/Login.module.css'
 import Link from 'next/link'
 
-import { FcGoogle } from 'react-icons/fc'
+import { FcGoogle, FcNeutralTrading } from 'react-icons/fc'
 import { AiFillGithub } from "react-icons/ai";
 import { FaTwitter, FaFacebookSquare } from "react-icons/fa"
 
+import getConfig from 'next/config';
 // React Toastify
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { account } from '@/appwrite/appwriteConfig'
+import { account, databases } from '@/appwrite/appwriteConfig'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
+import { Query } from 'appwrite'
+import Preloader from '@/components/Preloader'
 
 export default function Login() {
 
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
+  const [loading, setLoading] = useState(true)
+
   const router = useRouter()
+  const { publicRuntimeConfig } = getConfig();
 
   useEffect(() => {
     const user = account.get()
     user.then(
-      (response) => {
-        router.push("/dashboard")
+      async (response) => {
+        const isBioDataFilled = await checkIfBioDataGiven()
+        console.log(isBioDataFilled, "FROM USE-EFFECT")
+        setLoading(false)
+        if (isBioDataFilled) {
+          router.push("/dashboard")
+        } else {
+          router.push("/onBoarding")
+        }
       },
       (err) => {
         console.log(err)
@@ -63,7 +76,14 @@ export default function Login() {
   async function loginUser() {
     try {
       const response = await account.createEmailSession(email, password);
-      router.push("/dashboard")
+      const isBioDataFilled = await checkIfBioDataGiven()
+
+      if (isBioDataFilled) {
+        router.push("/dashboard")
+      } else {
+        router.push("/onBoarding")
+      }
+
       if (response.err) {
         throw new Error(response.err);
       }
@@ -71,6 +91,17 @@ export default function Login() {
       throw error;
     }
   }
+
+  async function checkIfBioDataGiven() {
+    try {
+      const response = await (await databases.listDocuments(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, [Query.equal("Email", email)]))[0]
+      console.log(response, "FROM check bio fata func")
+      return response?.isBioDataFilled
+    } catch (err) {
+      throw err
+    }
+  }
+
   return (
     <>
       <Head>
@@ -79,58 +110,62 @@ export default function Login() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <main className={styles.loginContainer}>
-          <div className={styles.loginForm}>
-            <Image src={"/logo.png"} alt={"logo"} width={80} height={80} />
-            <h1>Welcome To Sensory-Cademy</h1>
-            <p>Login Via Email Or Social Handles</p>
-            <form className={styles.formInput} onSubmit={submitForm}>
-              <div className={styles.socialHandles}>
-                <button><FcGoogle /></button>
-                <button><Image src={"/linkedin.svg"} alt='linkedin logo' className={styles.linkedin} width={22} height={22} /></button>
-                <button><AiFillGithub /></button>
-                <button><FaTwitter className={styles.twitter} /></button>
-                <button><FaFacebookSquare className={styles.facebook} /></button>
-
-              </div>
-              <div className={styles.divider}>OR</div> {/* Divider with text */}
-              <input
-                type="email"
-                placeholder="Enter Your Email"
-                value={email}
-                onChange={handleInputChange}
-                id='email'
-                required
-                autoComplete="off"
-              />
-              <input
-                type="password"
-                placeholder="Enter Your Password"
-                value={password}
-                onChange={handleInputChange}
-                id='password'
-                required
-                autoComplete="off"
-              />
-              <button className={styles.submit} type="submit">Log In</button>
-              <p>Don't have an account yet ?? <Link href='/signUp'>Sign Up</Link></p>
-            </form>
-          </div>
+      {
+        !loading?(
+          <main>
+          <main className={styles.loginContainer}>
+            <div className={styles.loginForm}>
+              <Image src={"/logo.png"} alt={"logo"} width={80} height={80} />
+              <h1>Welcome To Sensory-Cademy</h1>
+              <p>Login Via Email Or Social Handles</p>
+              <form className={styles.formInput} onSubmit={submitForm}>
+                <div className={styles.socialHandles}>
+                  <button><FcGoogle /></button>
+                  <button><Image src={"/linkedin.svg"} alt='linkedin logo' className={styles.linkedin} width={22} height={22} /></button>
+                  <button><AiFillGithub /></button>
+                  <button><FaTwitter className={styles.twitter} /></button>
+                  <button><FaFacebookSquare className={styles.facebook} /></button>
+  
+                </div>
+                <div className={styles.divider}>OR</div> {/* Divider with text */}
+                <input
+                  type="email"
+                  placeholder="Enter Your Email"
+                  value={email}
+                  onChange={handleInputChange}
+                  id='email'
+                  required
+                  autoComplete="off"
+                />
+                <input
+                  type="password"
+                  placeholder="Enter Your Password"
+                  value={password}
+                  onChange={handleInputChange}
+                  id='password'
+                  required
+                  autoComplete="off"
+                />
+                <button className={styles.submit} type="submit">Log In</button>
+                <p>Don't have an account yet ?? <Link href='/signUp'>Sign Up</Link></p>
+              </form>
+            </div>
+          </main>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
         </main>
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
-      </main>
+        ): <Preloader/>
+      }
     </>
   )
 }
