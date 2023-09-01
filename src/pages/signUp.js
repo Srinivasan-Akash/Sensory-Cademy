@@ -5,7 +5,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import { v4 as uuidv4 } from 'uuid'
-import { account } from '@/appwrite/appwriteConfig'
+import { account, databases } from '@/appwrite/appwriteConfig'
+
+import getConfig from 'next/config';
+const { publicRuntimeConfig } = getConfig();
+
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,6 +23,7 @@ export default function signUp() {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const router = useRouter()
 
     function handleInputChange(event) {
         const eventFrom = event.target.id
@@ -52,13 +57,26 @@ export default function signUp() {
     async function registerUser() {
         try {
             const response = await account.create(uuidv4(), email, password, name);
-            console.log(response);
+            await addToDataBase()
             router.push("/")
             if (response.err) {
                 throw new Error(response.err);
             }
         } catch (error) {
             throw error;
+        }
+    }
+
+    async function addToDataBase() {
+        try {
+            const response = await databases.createDocument(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, uuidv4(), {
+                Name: name,
+                isBioDataFilled: false,
+                Email: email
+            })
+            console.log(response)
+        } catch (err) {
+            throw (err)
         }
     }
 
@@ -79,7 +97,7 @@ export default function signUp() {
                         <form onSubmit={submitForm} className={styles.formInput}>
                             <div className={styles.socialHandles}>
                                 <button><FcGoogle /></button>
-                                <button><Image src={"/linkedin.svg"} className={styles.linkedin} width={22} height={22} /></button>
+                                <button><Image src={"/linkedin.svg"} alt='linkedin logo' className={styles.linkedin} width={22} height={22} /></button>
                                 <button><AiFillGithub /></button>
                                 <button><FaTwitter className={styles.twitter} /></button>
                                 <button><FaFacebookSquare className={styles.facebook} /></button>
@@ -91,21 +109,21 @@ export default function signUp() {
                                 value={name}
                                 id='name'
                                 required
-                                autocomplete="off"
+                                autoComplete="off"
                                 onChange={handleInputChange}
                             />
                             <input
                                 type="email"
                                 placeholder="Enter Your Email"
                                 value={email}
-                                autocomplete="off"
+                                autoComplete="off"
                                 required
                                 id='email'
                                 onChange={handleInputChange}
                             />
                             <input
                                 type="password"
-                                autocomplete="off"
+                                autoComplete="off"
                                 required
                                 id='password'
                                 placeholder="Enter Your Password"

@@ -88,7 +88,7 @@ export default function Login() {
             <form className={styles.formInput} onSubmit={submitForm}>
               <div className={styles.socialHandles}>
                 <button><FcGoogle /></button>
-                <button><Image src={"/linkedin.svg"} alt={"linkedin"} className={styles.linkedin} width={22} height={22} /></button>
+                <button><Image src={"/linkedin.svg"} alt='linkedin logo' className={styles.linkedin} width={22} height={22} /></button>
                 <button><AiFillGithub /></button>
                 <button><FaTwitter className={styles.twitter} /></button>
                 <button><FaFacebookSquare className={styles.facebook} /></button>
@@ -102,6 +102,7 @@ export default function Login() {
                 onChange={handleInputChange}
                 id='email'
                 required
+                autoComplete="off"
               />
               <input
                 type="password"
@@ -110,6 +111,7 @@ export default function Login() {
                 onChange={handleInputChange}
                 id='password'
                 required
+                autoComplete="off"
               />
               <button className={styles.submit} type="submit">Log In</button>
               <p>Don't have an account yet ?? <Link href='/signUp'>Sign Up</Link></p>
