@@ -23,16 +23,18 @@ export default function Login() {
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
   const [loading, setLoading] = useState(false)
+  const [userInfo, setUserInfo] = useState()
 
   const router = useRouter()
   const { publicRuntimeConfig } = getConfig();
 
   useEffect(() => {
     const user = account.get()
+    
     user.then(
       async (response) => {
+        setUserInfo(response)
         const isBioDataFilled = await checkIfBioDataGiven()
-        console.log(isBioDataFilled, "FROM USE-EFFECT")
         setLoading(false)
         if (isBioDataFilled) {
           router.push("/dashboard")
@@ -94,8 +96,7 @@ export default function Login() {
 
   async function checkIfBioDataGiven() {
     try {
-      const response = await (await databases.listDocuments(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, [Query.equal("Email", email)]))[0]
-      console.log(response, "FROM check bio fata func")
+      const response = await databases.getDocument(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, userInfo?.$id)
       return response?.isBioDataFilled
     } catch (err) {
       throw err
