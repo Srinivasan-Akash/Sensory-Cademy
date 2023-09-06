@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import styles from '@/styles/OnBoarding.module.css';
 import Image from 'next/image';
+import { ToastContainer, toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css"
 
 export default function OnBoarding() {
   const questions = [
@@ -34,9 +36,26 @@ export default function OnBoarding() {
     });
 
     // Scroll to the next question
+    scrollToView(questionIndex)
+  }
+
+  async function scrollToView(questionIndex) {
     if (questionIndex < questions.length - 1) {
-      setTimeout(() => questionRefs[questionIndex + 1].current.scrollIntoView({ behavior: 'smooth' }), 500)
+      setTimeout(() => questionRefs[questionIndex + 1].current.scrollIntoView({ behavior: 'smooth' }), 250)
+    } else {
+      await toast.promise(
+        () => updateDB(),
+        {
+            pending: 'Sending Email',
+            success: 'Email Sent 👌',
+            error: 'Operation Failed 🤯',
+        }
+    );
     }
+  }
+
+  async function updateDB() {
+    console.log("first")
   }
 
   return (
@@ -71,9 +90,21 @@ export default function OnBoarding() {
       <div className={styles.navigationButtons}>
         <button>Made By Akash With Love 💖</button>
         <button>
-          <Image src={"/codingyogi.png"} width={60} height={30} />
+          <Image src={"/codingyogi.png"} width={60} height={30} alt='sponsers logo'/>
         </button>
       </div>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
     </main>
   );
 }
