@@ -15,7 +15,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { account, databases } from '@/appwrite/appwriteConfig'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { Query } from 'appwrite'
 import Preloader from '@/components/Preloader'
 
 export default function Login() {
@@ -23,29 +22,20 @@ export default function Login() {
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
   const [loading, setLoading] = useState(false)
-  const [userInfo, setUserInfo] = useState()
 
   const router = useRouter()
   const { publicRuntimeConfig } = getConfig();
 
   useEffect(() => {
-    const user = account.get()
-    
-    user.then(
-      async (response) => {
-        setUserInfo(response)
-        const isBioDataFilled = await checkIfBioDataGiven()
-        setLoading(false)
-        if (isBioDataFilled) {
-          router.push("/dashboard")
-        } else {
-          router.push("/onBoarding")
-        }
-      },
-      (err) => {
-        console.log(err)
+    const isBioDataFilled = checkIfBioDataGiven()
+
+    isBioDataFilled.then((res) => {
+      if (res === true) {
+        router.push("/dashboard")
+      } else if (res === false) {
+        router.push("/onBoarding")
       }
-    )
+    })
   }, [router])
 
   function handleInputChange(event) {
@@ -96,10 +86,11 @@ export default function Login() {
 
   async function checkIfBioDataGiven() {
     try {
+      const userInfo = await account.get()
       const response = await databases.getDocument(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, userInfo?.$id)
       return response?.isBioDataFilled
     } catch (err) {
-      throw err
+      console.log(err)
     }
   }
 
@@ -112,60 +103,60 @@ export default function Login() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {
-        !loading?(
+        !loading ? (
           <main>
-          <main className={styles.loginContainer}>
-            <div className={styles.loginForm}>
-              <Image src={"/logo.png"} alt={"logo"} width={80} height={80} />
-              <h1>Welcome To Sensory-Cademy</h1>
-              <p>Login Via Email Or Social Handles</p>
-              <form className={styles.formInput} onSubmit={submitForm}>
-                <div className={styles.socialHandles}>
-                  <button><FcGoogle /></button>
-                  <button><Image src={"/linkedin.svg"} alt='linkedin logo' className={styles.linkedin} width={22} height={22} /></button>
-                  <button><AiFillGithub /></button>
-                  <button><FaTwitter className={styles.twitter} /></button>
-                  <button><FaFacebookSquare className={styles.facebook} /></button>
-  
-                </div>
-                <div className={styles.divider}>OR</div> {/* Divider with text */}
-                <input
-                  type="email"
-                  placeholder="Enter Your Email"
-                  value={email}
-                  onChange={handleInputChange}
-                  id='email'
-                  required
-                  autoComplete="off"
-                />
-                <input
-                  type="password"
-                  placeholder="Enter Your Password"
-                  value={password}
-                  onChange={handleInputChange}
-                  id='password'
-                  required
-                  autoComplete="off"
-                />
-                <button className={styles.submit} type="submit">Log In</button>
-                <p>Don't have an account yet ?? <Link href='/signUp'>Sign Up</Link></p>
-              </form>
-            </div>
+            <main className={styles.loginContainer}>
+              <div className={styles.loginForm}>
+                <Image src={"/logo.png"} alt={"logo"} width={80} height={80} />
+                <h1>Welcome To Sensory-Cademy</h1>
+                <p>Login Via Email Or Social Handles</p>
+                <form className={styles.formInput} onSubmit={submitForm}>
+                  <div className={styles.socialHandles}>
+                    <button><FcGoogle /></button>
+                    <button><Image src={"/linkedin.svg"} alt='linkedin logo' className={styles.linkedin} width={22} height={22} /></button>
+                    <button><AiFillGithub /></button>
+                    <button><FaTwitter className={styles.twitter} /></button>
+                    <button><FaFacebookSquare className={styles.facebook} /></button>
+
+                  </div>
+                  <div className={styles.divider}>OR</div> {/* Divider with text */}
+                  <input
+                    type="email"
+                    placeholder="Enter Your Email"
+                    value={email}
+                    onChange={handleInputChange}
+                    id='email'
+                    required
+                    autoComplete="off"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Enter Your Password"
+                    value={password}
+                    onChange={handleInputChange}
+                    id='password'
+                    required
+                    autoComplete="off"
+                  />
+                  <button className={styles.submit} type="submit">Log In</button>
+                  <p>Don't have an account yet ?? <Link href='/signUp'>Sign Up</Link></p>
+                </form>
+              </div>
+            </main>
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+            />
           </main>
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-          />
-        </main>
-        ): <Preloader/>
+        ) : <Preloader />
       }
     </>
   )

@@ -59,16 +59,15 @@ export default function OnBoarding() {
       await toast.promise(
         () => updateDB(),
         {
-          pending: 'Sending Email',
-          success: 'Email Sent 👌',
-          error: 'Operation Failed 🤯',
+          pending: 'Redirecting To DashBoard',
+          // success: '👌',
+          // error: 'Operation Failed 🤯',
         }
       );
     }
   }
 
   async function updateDB() {
-
     const [Role, Gender, Disability] = selectedAnswers
     const response = await databases.updateDocument(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, userInfo?.$id, {
       isBioDataFilled: true,
@@ -76,6 +75,9 @@ export default function OnBoarding() {
       Gender,
       Disability
     })
+
+    router.push("/dashboard")
+
     console.log(response)
   }
 
