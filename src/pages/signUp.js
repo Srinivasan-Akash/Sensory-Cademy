@@ -54,9 +54,10 @@ export default function signUp() {
     }
 
     async function registerUser() {
+        const uuid = uuidv4()
         try {
-            const response = await account.create(uuidv4(), email, password, name);
-            await addToDataBase()
+            const response = await account.create(uuid, email, password, name);
+            await addToDataBase(uuid)
             router.push("/")
             if (response.err) {
                 throw new Error(response.err);
@@ -66,9 +67,9 @@ export default function signUp() {
         }
     }
 
-    async function addToDataBase() {
+    async function addToDataBase(uuid) {
         try {
-            const response = await databases.createDocument(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, uuidv4(), {
+            const response = await databases.createDocument(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, uuid, {
                 Name: name,
                 isBioDataFilled: false,
                 Email: email
