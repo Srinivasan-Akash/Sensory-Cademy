@@ -44,6 +44,12 @@
     transition: all .5s ease;
 }
 
+#selected {
+    background: #183f2c;
+    border: 2px solid #8DA0AE;
+    transition: all 0.5s ease;
+  }
+
 .navigationButtons {
     position: fixed;
     bottom: 2%;
@@ -76,3 +82,4 @@
     border: 2px dashed #8DA0AE;
     transition: all .5s ease;
 }
+
