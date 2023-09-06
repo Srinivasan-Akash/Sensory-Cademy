@@ -1,30 +1,44 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '@/styles/OnBoarding.module.css';
 import Image from 'next/image';
+import { questions } from '@/utils/questions';
+
+import { account, databases } from '@/appwrite/appwriteConfig';
+import { useRouter } from 'next/router';
+
+import getConfig from 'next/config';
+
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
+import Preloader from '@/components/Preloader';
+
+import { v4 as uuidv4 } from 'uuid';
 
 export default function OnBoarding() {
-  const questions = [
-    {
-      question: "Who Are You ??",
-      options: ["Teacher", "Student", "Guardian", "Instructor"],
-      selectedOption: null,
-    },
-    {
-      question: "What Is Your Gender ??",
-      options: ["Male", "Female"],
-      selectedOption: null,
-    },
-    {
-      question: "What Is Your Disability ??",
-      options: ["Blind", "Deaf", "Dumb", "None"],
-      selectedOption: null,
-    },
-  ];
-
   const [selectedAnswers, setSelectedAnswers] = useState([]);
-  const questionRefs = questions.map(() => useRef(null)); // Create refs for each question
+  const [loading, setLoading] = useState(false)
+  const [userInfo, setUserInfo] = useState()
+  const { publicRuntimeConfig } = getConfig();
+
+  const questionRefs = questions.map(() => useRef(null))
+  const router = useRouter()
+
+  useEffect(() => {
+    const user = account.get()
+    setLoading(true)
+
+    user.then(
+      (response) => {
+        setLoading(false)
+        setUserInfo(response)
+        console.log(response)
+      },
+      (err) => {
+        setLoading(false)
+        router.push("/")
+      }
+    )
+  }, [router])
 
   function handleClick(questionIndex, optionIndex) {
     const selectedOption = questions[questionIndex].options[optionIndex];
@@ -35,7 +49,6 @@ export default function OnBoarding() {
       return updatedAnswers;
     });
 
-    // Scroll to the next question
     scrollToView(questionIndex)
   }
 
@@ -46,65 +59,78 @@ export default function OnBoarding() {
       await toast.promise(
         () => updateDB(),
         {
-            pending: 'Sending Email',
-            success: 'Email Sent 👌',
-            error: 'Operation Failed 🤯',
+          pending: 'Sending Email',
+          success: 'Email Sent 👌',
+          error: 'Operation Failed 🤯',
         }
-    );
+      );
     }
   }
 
   async function updateDB() {
-    console.log("first")
+
+    const [Role, Gender, Disability] = selectedAnswers
+    const response = await databases.updateDocument(publicRuntimeConfig.APPWRITE_DATABASE_ID, publicRuntimeConfig.APPWRITE_COLLECTION_ID, userInfo?.$id, {
+      isBioDataFilled: true,
+      Role,
+      Gender,
+      Disability
+    })
+    console.log(response)
   }
 
   return (
-    <main className={styles.container}>
-      {questions.map((element, questionIndex) => (
-        <div
-          className={styles.question}
-          id={`question-${questionIndex}`}
-          key={questionIndex}
-          ref={questionRefs[questionIndex]} // Assign the ref to the question element
-        >
-          <h1>{element.question}</h1>
-          <div className={styles.options}>
-            {element.options.map((option, optionIndex) => (
+    <>
+      {
+        loading ? <Preloader /> :
+          <main className={styles.container}>
+            {questions.map((element, questionIndex) => (
               <div
-                onClick={() => handleClick(questionIndex, optionIndex)}
-                className={styles.option}
-                id={
-                  selectedAnswers[questionIndex] === option
-                    ? styles.selected
-                    : '' // Apply the "selected" class when selected
-                }
-                key={optionIndex}
+                className={styles.question}
+                id={`question-${questionIndex}`}
+                key={questionIndex}
+                ref={questionRefs[questionIndex]} // Assign the ref to the question element
               >
-                <h2>{option}</h2>
+                <h1>{element.question}</h1>
+                <div className={styles.options}>
+                  {element.options.map((option, optionIndex) => (
+                    <div
+                      onClick={() => handleClick(questionIndex, optionIndex)}
+                      className={styles.option}
+                      id={
+                        selectedAnswers[questionIndex] === option
+                          ? styles.selected
+                          : '' // Apply the "selected" class when selected
+                      }
+                      key={optionIndex}
+                    >
+                      <h2>{option}</h2>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
-          </div>
-        </div>
-      ))}
 
-      <div className={styles.navigationButtons}>
-        <button>Made By Akash With Love 💖</button>
-        <button>
-          <Image src={"/codingyogi.png"} width={60} height={30} alt='sponsers logo'/>
-        </button>
-      </div>
-      <ToastContainer
-        position="bottom-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-      />
-    </main>
+            <div className={styles.navigationButtons}>
+              <button>Made By Akash With Love 💖</button>
+              <button>
+                <Image src={"/codingyogi.png"} width={60} height={30} alt='sponsers logo' />
+              </button>
+            </div>
+            <ToastContainer
+              position="bottom-center"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+            />
+          </main>
+      }
+    </>
   );
 }
